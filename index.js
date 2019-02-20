@@ -149,10 +149,15 @@ server.put('/api/students/:id', async (req, res) => {
 server.delete('/api/students/:id', async (req, res) => {
 	try {
 		const { id } = req.params;
-		const result = await db('students')
-			.where('id', id)
-			.del();
-		res.status(204).json({ message: 'Successfully deleted the student', result });
+		const studentCheck = await db('students').where('id', id);
+		if (studentCheck.length) {
+			const result = await db('students')
+				.where('id', id)
+				.del();
+			res.status(204).json({ message: 'Successfully deleted the student', result });
+		} else {
+			res.status(404).json({ message: 'Unable to find a student with that ID' });
+		}
 	} catch (error) {
 		res.status(500).json({ message: 'Unable to delete the student' });
 	}
