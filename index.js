@@ -99,13 +99,34 @@ server.get('/api/students', async (req, res) => {
 	}
 });
 
+//
+// server.get('/api/students/:id', async (req, res) => {
+// 	try {
+// 		const { id } = req.params;
+// 		const studentCheck = await db('students').where('id', id);
+// 		if (studentCheck.length) {
+// 			const result = await db('students').where('id', id);
+// 			res.status(200).json(result);
+// 		} else {
+// 			res.status(440).json({ message: 'Unable to find a student with that ID' });
+// 		}
+// 	} catch (error) {
+// 		res.status(500).json(error);
+// 	}
+// });
+
+//Stretch
 server.get('/api/students/:id', async (req, res) => {
 	try {
 		const { id } = req.params;
 		const studentCheck = await db('students').where('id', id);
 		if (studentCheck.length) {
-			const result = await db('students').where('id', id);
-			res.status(200).json(result);
+			const students = await db('students')
+				.join('cohorts', 'students.cohort_id', 'cohorts.id')
+				.select('students.id', 'students.name as name', 'cohorts.name as cohort')
+				.where('students.id', id);
+
+			res.status(200).json(students);
 		} else {
 			res.status(440).json({ message: 'Unable to find a student with that ID' });
 		}
